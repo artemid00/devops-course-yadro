@@ -1,0 +1,12 @@
+*.md
+*.env
+*.env.*
+*.swp
+*.json
+*.yml
+.dockerignore
+.gitignore
+.gitlab-ci.yml
+
+.git
+reports/

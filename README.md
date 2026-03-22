@@ -21,15 +21,15 @@ The service:
 Returns service metadata (version, author, service name).
 
 ```GET /info/currency```
-Returns exchange rates.  
-Optional parameters:  
+Returns exchange rates.
+Optional parameters:
 - currency — ISO 4217 code (example: USD)*
 - date — date in format YYYY-MM-DD
 
 ```GET /metrics```
 Returns Prometheus metrics.
 *Custom metric:*
-- `currencyapi_api_requests_total{result="success|error"}`  
+- `currencyapi_api_requests_total{result="success|error"}`
 
 Number of API requests by result (HTTP status < 400 is `success`, otherwise `error`)
 
