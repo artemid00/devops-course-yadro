@@ -17,7 +17,8 @@
 
   Central Bank of Russia API
 
-  has 2 endpoints:
+  has 3 endpoints:
+  GET /metrics - returns Prometheus metrics
   GET /info - returns service info
   GET /info/currency?date=YYYY-MM-DD&currency=CODE  - returns exchange rates
   for specified date and currency code
@@ -32,6 +33,7 @@ import (
 
 	"currencyAPI/internal/config"
 	"currencyAPI/internal/handlers"
+	"currencyAPI/internal/metrics"
 	"currencyAPI/internal/repository"
 	"currencyAPI/internal/usecase"
 
@@ -47,6 +49,8 @@ func main() {
 	gin.DefaultErrorWriter = log.Writer()
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
+	r.Use(metrics.GinMiddleware())
+	r.GET("/metrics", gin.WrapH(metrics.Handler()))
 
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 	repo := repository.NewRepository(httpClient)

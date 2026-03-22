@@ -51,8 +51,7 @@ func (r *Repository) DailyRates(ctx context.Context, date time.Time) ([]domain.R
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0")
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := r.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error make request: %w", err)
 	}
