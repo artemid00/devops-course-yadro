@@ -1,0 +1,15 @@
+services:
+  currency:
+    build: .
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      - PORT=$PORT
+      - AUTHOR=$AUTHOR
+      - VERSION=$VERSION
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:${PORT}/info || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
