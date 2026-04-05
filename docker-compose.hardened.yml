@@ -2,13 +2,13 @@ services:
   currency:
     build: .
     ports:
-      - "${PORT}:${PORT}"
+      - "${PORT:-8000}:${PORT:-8000}"
     environment:
-      - PORT=$PORT
-      - AUTHOR=$AUTHOR
-      - VERSION=$VERSION
+      - PORT=${PORT:-8000}
+      - AUTHOR=${AUTHOR:-"a.bezpyatko"}
+      - VERSION=${VERSION:-"1.1.0"}
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:${PORT}/info || exit 1"]
+      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:${PORT:-8000}/info || exit 1"]
       interval: 10s
       timeout: 3s
       retries: 3

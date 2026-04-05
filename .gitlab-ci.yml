@@ -88,8 +88,8 @@ deploy_job:
   tags:
     - shell
   script:
-    - docker compose down
-    - docker compose up -d
+    - docker compose -f docker-compose.hardened.yml down
+    - docker compose -f docker-compose.hardened.yml up -d
   rules:
     - if: '$CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "main"'
       when: manual
