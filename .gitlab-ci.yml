@@ -52,12 +52,12 @@ sast_job:
     SEMGREP_APP_TOKEN: $SEMGREP_APP_TOKEN
   script:
     - echo "============= SCAN APP ============"
-    - semgrep ci --config auto --json --output reports/semgrep.json
+    - semgrep ci --code --json --output reports/semgrep.json
     - echo "============= SCAN DONE ============"
   artifacts:
     when: always
     paths:
-      - reports/lint.txt
+      - reports/semgrep.json
 
 build_job:
   stage: build
