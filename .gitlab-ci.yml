@@ -52,7 +52,7 @@ sast_job:
     SEMGREP_APP_TOKEN: $SEMGREP_APP_TOKEN
   script:
     - echo "============= SCAN APP ============"
-    - semgrep ci --json --output reports/semgrep.json
+    - semgrep ci --json
     - echo "============= SCAN DONE ============"
   artifacts:
     when: always
