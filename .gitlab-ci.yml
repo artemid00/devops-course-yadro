@@ -130,14 +130,26 @@ push_job:
     - skopeo copy --dest-creds "$DOCKER_HUB_USER:$DOCKER_HUB_TOKEN" docker-archive:images/image.tar "docker://docker.io/$DOCKER_HUB_USER/$APP_NAME:$CI_COMMIT_SHA"
     - echo "=============== Image pushed successfully ==============="
 
-deploy_job:
+deploy:staging:
   stage: deploy
   tags:
-    - shell
+    - staging_shell
   script:
     - docker compose -f docker-compose.yml down
     - docker compose -f docker-compose.yml up -d
   rules:
     - if: '$CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "main"'
+      when: manual
+    - when: never
+
+deploy:production:
+  stage: deploy
+  tags:
+    - production_shell
+  script:
+    - docker compose -f docker-compose.yml down
+    - docker compose -f docker-compose.yml up -d
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v.*/'
       when: manual
     - when: never
