@@ -17,12 +17,13 @@ lint_code:
         - main.go
   script:
     - echo "============= Lint Code ============"
-    - golangci-lint run --output.json.path reports/golang-lint-report.json  ./... 
+    - golangci-lint run --output.json.path golang-lint-report.json  ./... 
     - echo "============= Lint Done ============"
   artifacts:
     when: always
+    expire_in: 7 days
     paths:
-      - reports/golang-lint-report.json
+      - golang-lint-report.json
 
 lint_dockerfile:
   stage: lint
@@ -35,12 +36,13 @@ lint_dockerfile:
         - Dockerfile
   script:
     - echo "============= Lint Dockerfile ============"
-    - hadolint -f json Dockerfile > reports/hadolint-report.json
+    - hadolint -f json Dockerfile > hadolint-report.json
     - echo "============= Lint success! ================="
   artifacts:
     when: always
+    expire_in: 7 days
     paths:
-      - reports/hadolint-report.txt
+      - hadolint-report.txt
 
 sast_job:
   stage: sast
@@ -52,12 +54,13 @@ sast_job:
     SEMGREP_APP_TOKEN: ""
   script:
     - echo "============= SCAN APP ============"
-    - semgrep scan --config ci/conf/ci-rules.yml --config ci/conf/go-rules.yml --metrics=off --severity ERROR --json --output reports/semgrep-report.json . 
+    - semgrep scan --config ci/conf/ci-rules.yml --config ci/conf/go-rules.yml --metrics=off --severity ERROR --json --output semgrep-report.json . 
     - echo "============= SCAN DONE ============"
   artifacts:
     when: always
+    expire_in: 7 days
     paths:
-      - reports/semgrep-report.json
+      - semgrep-report.json
 
 build_job:
   stage: build
@@ -91,13 +94,14 @@ sca_job:
     entrypoint: [""]
   script:
     - echo "=============== Run SCA check ==============="
-    - trivy image --input images/image.tar --severity=HIGH,CRITICAL --exit-code 1
+    - trivy image --input images/image.tar --severity=HIGH,CRITICAL -f json -o trivy-report.json --exit-code 1
     - echo "=============== SCA check Done ==============="
   artifacts:
-    when: on_success
-    expire_in: 1 days
+    expire_in: 7 days
     paths:
       - images/ 
+      - trivy-report.json
+    when: always
 
 push_job:
   stage: push
