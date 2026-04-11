@@ -17,7 +17,7 @@ lint_code:
         - main.go
   script:
     - echo "============= Lint Code ============"
-    - golangci-lint run ./... --out-format json > reports/lint.json
+    - golangci-lint run ./... --output json > reports/lint.json
     - echo "============= Lint Done ============"
   artifacts:
       paths:
@@ -50,7 +50,7 @@ sast_job:
     SEMGREP_APP_TOKEN: $SEMGREP_APP_TOKEN
   script:
     - echo "============= SCAN APP ============"
-    - semgrep scan --config auto --metrics=off --error --json --output reports/semgrep.json
+    - semgrep scan --config auto --error --json --output reports/semgrep.json
     - echo "============= SCAN DONE ============"
   artifacts:
     paths:
