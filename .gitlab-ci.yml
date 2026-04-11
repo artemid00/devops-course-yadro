@@ -17,12 +17,12 @@ lint_code:
         - main.go
   script:
     - echo "============= Lint Code ============"
-    - golangci-lint run ./... | tee reports/lint.txt
+    - golangci-lint run --output.json.path reports/golang-lint-report.json  ./... 
     - echo "============= Lint Done ============"
   artifacts:
     when: always
     paths:
-      - reports/lint.txt
+      - reports/golang-lint-report.json
 
 lint_dockerfile:
   stage: lint
@@ -35,12 +35,12 @@ lint_dockerfile:
         - Dockerfile
   script:
     - echo "============= Lint Dockerfile ============"
-    - hadolint -f json Dockerfile > reports/hadolint.json
+    - hadolint -f json Dockerfile > reports/hadolint-report.json
     - echo "============= Lint success! ================="
   artifacts:
     when: always
     paths:
-      - reports/lint.txt
+      - reports/hadolint-report.txt
 
 sast_job:
   stage: sast
@@ -52,12 +52,12 @@ sast_job:
     SEMGREP_APP_TOKEN: ""
   script:
     - echo "============= SCAN APP ============"
-    - semgrep scan 
+    - semgrep scan --config auto --severity ERROR --json --output semgrep-report.json . 
     - echo "============= SCAN DONE ============"
   artifacts:
     when: always
     paths:
-      - reports/semgrep.json
+      - reports/semgrep-report.json
 
 build_job:
   stage: build
