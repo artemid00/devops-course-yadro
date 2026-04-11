@@ -52,9 +52,8 @@ sast_job:
     SEMGREP_APP_TOKEN: ""
   script:
     - echo "============= SCAN APP ============"
-    - semgrep scan --config ci/conf/ci-rules.yml --config ci/conf/go-rules.yml --metrics=off --severity ERROR --json --output semgrep-report.json . 
+    - semgrep scan --config ci/conf/ci-rules.yml --config ci/conf/go-rules.yml --metrics=off --severity ERROR --json --output reports/semgrep-report.json . 
     - echo "============= SCAN DONE ============"
-    - ls
   artifacts:
     when: always
     paths:
