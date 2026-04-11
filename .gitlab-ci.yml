@@ -90,6 +90,12 @@ sca_job:
   stage: build
   needs:
     - build_job
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"'
+      exists:
+        - Dockerfile
+      when: always
+    - when: never
   tags:
     - docker
   image: 
