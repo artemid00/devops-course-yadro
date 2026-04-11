@@ -117,7 +117,7 @@ push_job:
   needs:
     - sca_job
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_TAG =~ /^v.*/'
       when: always
     - when: never
   variables:
@@ -127,29 +127,41 @@ push_job:
     entrypoint: [""]
   script:
     - echo "=============== Push image to docker hub ==============="
-    - skopeo copy --dest-creds "$DOCKER_HUB_USER:$DOCKER_HUB_TOKEN" docker-archive:images/image.tar "docker://docker.io/$DOCKER_HUB_USER/$APP_NAME:$CI_COMMIT_SHA"
+    - |
+      if [[ -n "$CI_COMMIT_TAG" ]]; then
+        IMAGE_TAG="$CI_COMMIT_TAG"$CI_COMMIT_SHA
+      else
+        IMAGE_TAG="$CI_COMMIT_SHA"
+      fi
+      skopeo copy --dest-creds "$DOCKER_HUB_USER:$DOCKER_HUB_TOKEN" docker-archive:images/image.tar "docker://docker.io/$DOCKER_HUB_USER/$APP_NAME:$IMAGE_TAG"
     - echo "=============== Image pushed successfully ==============="
 
-deploy:staging:
+trigger:deploy:staging:
   stage: deploy
-  tags:
-    - staging_shell
-  script:
-    - docker compose -f docker-compose.yml down
-    - docker compose -f docker-compose.yml up -d
+  variables:
+    ENVIRONMENT: "production"
+    IMAGE_TAG: "$CI_COMMIT_SHA"
+    APP_NAME: "currencyAPI"
   rules:
     - if: '$CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "main"'
-      when: manual
+      when: always
     - when: never
+  trigger:
+    include:
+      - local: ci/.gitlab-ci.deploy.yml
+    strategy: depend
 
-deploy:production:
+trigger:deploy:production:
   stage: deploy
-  tags:
-    - production_shell
-  script:
-    - docker compose -f docker-compose.yml down
-    - docker compose -f docker-compose.yml up -d
+  variables:
+    ENVIRONMENT: "staging"
+    IMAGE_TAG: "$CI_COMMIT_TAG"
+    APP_NAME: "currencyAPI"
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v.*/'
       when: manual
     - when: never
+  trigger:
+    include:
+      - local: ci/.gitlab-ci.deploy.yml
+    strategy: depend
