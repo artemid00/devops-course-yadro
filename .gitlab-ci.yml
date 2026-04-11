@@ -49,7 +49,7 @@ sast_job:
   needs: []
   image: semgrep/semgrep@sha256:892ae188a616ee77e5fb6d151602283cb9ec2ed5d4cf5f45f7eace619d9e685b
   variables:
-    SEMGREP_APP_TOKEN: $SEMGREP_APP_TOKEN
+    SEMGREP_APP_TOKEN: "$SEMGREP_APP_TOKEN"
   script:
     - echo "============= SCAN APP ============"
     - semgrep ci --json
