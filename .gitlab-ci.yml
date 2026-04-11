@@ -17,11 +17,11 @@ lint_code:
         - main.go
   script:
     - echo "============= Lint Code ============"
-    - golangci-lint run ./... --output json > reports/lint.json
+    - golangci-lint run ./... > reports/lint.txt
     - echo "============= Lint Done ============"
   artifacts:
       paths:
-        - reports/lint.json
+        - reports/lint.txt
 
 lint_dockerfile:
   stage: lint
@@ -50,6 +50,7 @@ sast_job:
     SEMGREP_APP_TOKEN: $SEMGREP_APP_TOKEN
   script:
     - echo "============= SCAN APP ============"
+    - cd $CI_PROJECT_DIR
     - semgrep scan --config auto --error --json --output reports/semgrep.json
     - echo "============= SCAN DONE ============"
   artifacts:
