@@ -1,6 +1,6 @@
 services:
   currency:
-    image: ${DOCKER_HUB_USER:-"artemi00"}/${APP_NAME:-"currencyAPI"}/${IMAGE_TAG:-"latest"}
+    image: ${DOCKER_HUB_USER:-"artemi00"}/${APP_NAME:-"currency_api"}:${IMAGE_TAG:-"latest"}
     ports:
       - "${PORT:-8000}:${PORT:-8000}"
     environment:
