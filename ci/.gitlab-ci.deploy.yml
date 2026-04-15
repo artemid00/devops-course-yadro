@@ -1,0 +1,26 @@
+stages:
+  - deploy
+  - smoke
+
+variables:
+  APP_NAME: "${APP_NAME}"
+  IMAGE_TAG: "${IMAGE_TAG}"
+  ENVIRONMENT: "${ENVIRONMENT}"
+
+deploy_job:
+  stage: deploy
+  tags:
+    - "${ENVIRONMENT}_shell"
+  script:
+    - echo "========= Deploy to ${ENVIRONMENT} ========="
+    - docker pull ${DOCKER_HUB_USER}/${APP_NAME}:${IMAGE_TAG}
+    - docker compose -f docker-compose.yml down
+    - docker compose -f docker-compose.yml up -d
+
+smoke_test:
+  stage: smoke
+  tags:
+    - "${ENVIRONMENT}_shell"
+  script:
+    - echo "======== Smoke test ========"
+    - curl -s "http://localhost:${PORT:-8000}/info" || exit 1

@@ -1,4 +1,4 @@
-FROM golang@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa AS builder
+FROM golang@sha256:c2a1f7b2095d046ae14b286b18413a05bb82c9bca9b25fe7ff5efef0f0826166 AS builder
 
 WORKDIR /app
 
@@ -10,22 +10,13 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o currencyAPI .
 
 # ==-==-==-==-==-==-==-==-==
 
-FROM alpine@sha256:55ae5d250caebc548793f321534bc6a8ef1d116f334f18f4ada1b2daad3251b2 AS runtime
+FROM gcr.io/distroless/static:nonroot AS runtime
 
-ENV PORT=8000
-ENV AUTHOR=a.bezpyatko
-ENV VERSION=1.1.0
-
-RUN addgroup -g 1001 appuser && \ 
-    adduser -u 1001 -G appuser -S appuser
-COPY --from=builder --chown=appuser:appuser /app/currencyAPI /app/currencyAPI
-
-USER appuser
 WORKDIR /app
+COPY --from=builder /app/currencyAPI /app/currencyAPI
+
+USER nonroot
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-            CMD wget --spider --quiet http://localhost:$PORT/info || exit 1
-
-CMD ["./currencyAPI"]
+CMD ["/app/currencyAPI"]

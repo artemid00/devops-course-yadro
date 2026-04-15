@@ -1,15 +1,20 @@
 services:
   currency:
-    build: .
+    image: ${DOCKER_HUB_USER:-"artemi00"}/${APP_NAME:-"currency_api"}:${IMAGE_TAG:-"latest"}
     ports:
-      - "${PORT}:${PORT}"
+      - "${PORT:-8000}:${PORT:-8000}"
     environment:
-      - PORT=$PORT
-      - AUTHOR=$AUTHOR
-      - VERSION=$VERSION
-    healthcheck:
-      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:${PORT}/info || exit 1"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
-      start_period: 5s
+      - PORT=${PORT:-8000}
+      - AUTHOR=${AUTHOR:-"a.bezpyatko"}
+      - VERSION=${VERSION:-"1.1.0"}
+    read_only: true
+    cap_drop: ["ALL"]
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+            memory: 256m
+            cpus: "0.5"

@@ -55,7 +55,12 @@ func (r *Repository) DailyRates(ctx context.Context, date time.Time) ([]domain.R
 	if err != nil {
 		return nil, fmt.Errorf("error make request: %w", err)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			fmt.Printf("failed to close response body: %v\n", err)
+		}
+	}()
 
 	raw, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -67,7 +72,7 @@ func (r *Repository) DailyRates(ctx context.Context, date time.Time) ([]domain.R
 		return nil, fmt.Errorf("error decode windows-1251: %w", err)
 	}
 
-	decoded = strings.Replace(decoded, `encoding="windows-1251"`, "", -1)
+	decoded = strings.ReplaceAll(decoded, `encoding="windows-1251"`, "")
 
 	var curs ValCurs
 	if err := xml.Unmarshal([]byte(decoded), &curs); err != nil {
