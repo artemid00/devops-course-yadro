@@ -1,2 +1,3 @@
 ---
 # defaults file for kubeadm
+k8s_verion: "1.35"
