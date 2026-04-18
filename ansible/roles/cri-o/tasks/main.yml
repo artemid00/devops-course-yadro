@@ -1,0 +1,40 @@
+---
+# tasks file for cri-o
+
+- name: Install required utils
+  ansible.builtin.apt:
+    name: 
+      - curl
+      - software-properties-common
+      - gpg
+    state: present
+    update_cache: yes
+ 
+- name: Create keyrings dir
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Get gpg key
+  ansible.builtin.shell: >
+    curl -fsSL https://download.opensuse.org/repositories/isv:/cri-o:/stable:{{ crio_version }}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+  args:
+    creates: /etc/apt/keyrings/cri-o-apt-keyring.gpg
+
+- name: Add CRI-O repo
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb/ /"
+    state: present
+
+- name: Install CRI-O
+  ansible.builtin.apt:
+    name: cri-o
+    state: present
+    update_cache: yes
+
+- name: Start CRI-O
+  ansible.builtin.systemd:
+    name: cri-o
+    state: started
+    enabled: yes
