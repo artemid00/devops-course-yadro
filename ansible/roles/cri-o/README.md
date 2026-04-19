@@ -1,11 +1,11 @@
-Role Name
+CRI-O
 =========
 Install CRI-O
 
 Requirements
 ------------
 
-OS: Ubuntu 22.04/24.04
+OS: Ubuntu 22.04/24.04  
 Root access: required
 
 Role Variables
