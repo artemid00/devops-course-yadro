@@ -1,4 +1,4 @@
 ---
 # defaults file for cri-o
 
-crio_version: "1.35"
+crio_version: "v1.35"

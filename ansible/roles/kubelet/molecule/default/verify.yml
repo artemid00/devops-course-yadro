@@ -1,0 +1,26 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Check if kubelet binary 
+      ansible.builtin.stat:
+        path: /usr/bin/kubelet
+      register: kubelet_bin
+
+    - name: Assert kubelet binary is exist
+      ansible.builtin.assert:
+        that:
+          - kubelet_bin.stat.exists
+        fail_msg: "kubelet binary not found"
+
+    - name: Check if kubelet is enabled
+      ansible.builtin.command: systemctl is-enabled kubelet
+      register: kubelet_enabled
+      changed_when: false
+
+    - name: Assert kubelet service is enabled
+      ansible.builtin.assert:
+        that:
+          - "'enabled' in kubelet_enabled.stdout"
+        fail_msg: "kubelet service is not enabled"

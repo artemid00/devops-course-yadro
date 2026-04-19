@@ -1,0 +1,35 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Check crio binary
+      ansible.builtin.stat:
+        path: /usr/bin/crio
+      register: crio_bin
+
+    - name: Assert crio binary is exist
+      ansible.builtin.assert:
+        that:
+          - crio_bin.stat.exists
+        fail_msg: "CRI-O binary not found"
+
+    - name: Check crio service is enabled and running
+      ansible.builtin.command: systemctl is-active cri-o
+      register: crio_status
+
+    - name: Assert crio service is active
+      ansible.builtin.assert:
+        that:
+          - "'active' in crio_status.stdout"
+        fail_msg: "CRI-O service isnt running"
+
+    - name: Check crio status
+      ansible.builtin.command: crio status
+      register: crio_info
+
+    - name: Assert crio response
+      ansible.builtin.assert:
+        that:
+          - crio_info.rc == 0
+        fail_msg: "CRI-O isnt responding"

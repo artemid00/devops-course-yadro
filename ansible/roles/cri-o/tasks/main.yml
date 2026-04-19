@@ -18,7 +18,7 @@
 
 - name: Get gpg key
   ansible.builtin.shell: >
-    curl -fsSL https://download.opensuse.org/repositories/isv:/cri-o:/stable:{{ crio_version }}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+    curl -fsSl https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
   args:
     creates: /etc/apt/keyrings/cri-o-apt-keyring.gpg
 

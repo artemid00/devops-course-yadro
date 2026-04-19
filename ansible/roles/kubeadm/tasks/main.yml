@@ -30,7 +30,7 @@
 
 - name: Install kubeadm
   ansible.builtin.apt:
-    name: "kubeadm={{ k8s_version }}"
+    name: "kubeadm={{ k8s_version }}*"
     state: present
     update_cache: yes
 

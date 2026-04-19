@@ -30,7 +30,7 @@
 
 - name: Install kubelet
   ansible.builtin.apt:
-    name: "kubelet={{ k8s_version }}"
+    name: "kubelet={{ k8s_version }}*"
     state: present
     update_cache: yes
 
@@ -43,4 +43,3 @@
   ansible.builtin.systemd:
     name: kubelet
     enabled: yes
-    state: started
