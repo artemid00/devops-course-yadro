@@ -1,0 +1,40 @@
+---
+# tasks file for kubectl
+
+- name: Install required utils
+  ansible.builtin.apt:
+    name:
+      - curl
+      - ca-certificates
+      - gpg
+      - apt-transport-https
+    state: present
+    update_cache: yes
+
+- name: Create keyrings dir
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Add Kubernetes gpg key
+  ansible.builtin.shell: >
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/v{{ k8s_version }}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  args:
+    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+- name: Add Kubernetes repo
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ k8s_version }}/deb/ /"
+    state: present
+
+- name: Install kubectl
+  ansible.builtin.apt:
+    name: "kubectl={{ k8s_version }}*"
+    state: present
+    update_cache: yes
+
+- name: Hold kubectl version
+  ansible.builtin.dpkg_selections:
+    name: kubectl
+    selection: hold
