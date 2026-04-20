@@ -11,7 +11,7 @@ Root access: required
 Role Variables
 --------------
 
-`k8s_version` - version of Kubernetes therefore kubeadm (default "1.35")
+`k8s_version` (string) - version of Kubernetes therefore kubeadm (default "1.35")
 
 Dependencies
 ------------
