@@ -2,21 +2,14 @@
 - name: Install CRI-O, Kubelet, Kubeadm
   hosts: all
   become: true
-
   roles:
     - cri-o
     - kubelet
     - kubeadm
 
-  post_tasks:
-    - name: Check installation
-      ansible.builtin.shell: >
-        crio --version 
-        kubelet --version
-        kubeadm version -o short
-      register: check_out
-      changed_when: false
+- name: Install Kubect
+  hosts: masters
+  become: true
+  roles:
+    - kubectl
 
-    - name: Get status
-      ansible.builtin.debug:
-        msg: "{{ check_out.stdout_lines }}"
