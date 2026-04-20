@@ -11,7 +11,7 @@ Root access: required
 Role Variables
 --------------
 
-`crio_version` - version of cri-o (default "v1.35")
+`crio_version` (string) - version of cri-o (default "v1.35")
 
 Dependencies
 ------------
