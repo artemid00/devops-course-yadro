@@ -1,3 +1,4 @@
 .gocache/
 *.env
 ansible/venv
+__pycache__

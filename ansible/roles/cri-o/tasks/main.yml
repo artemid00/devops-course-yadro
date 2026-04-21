@@ -3,28 +3,22 @@
 
 - name: Install required utils
   ansible.builtin.apt:
-    name: 
+    name:
       - curl
       - software-properties-common
       - gpg
+      - python3-debian  
     state: present
     update_cache: yes
- 
-- name: Create keyrings dir
-  ansible.builtin.file:
-    path: /etc/apt/keyrings
-    state: directory
-    mode: "0755"
 
-- name: Get gpg key
-  ansible.builtin.shell: >
-    curl -fsSl https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
-  args:
-    creates: /etc/apt/keyrings/cri-o-apt-keyring.gpg
-
-- name: Add CRI-O repo
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb/ /"
+- name: Add CRI-O repository 
+  ansible.builtin.deb822_repository:
+    name: cri-o
+    types: deb
+    uris: "https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb"
+    suites: "/"
+    components: [""]
+    signed_by: "https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb/Release.key"
     state: present
 
 - name: Install CRI-O
