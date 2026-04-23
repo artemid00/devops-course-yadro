@@ -23,4 +23,4 @@ smoke_test:
     - "${ENVIRONMENT}_shell"
   script:
     - echo "======== Smoke test ========"
-    - curl -s "http://localhost:${PORT:-8000}/info" || exit 1
+    - curl -v "http://localhost:${PORT:-8000}/info" || exit 1

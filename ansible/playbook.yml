@@ -1,0 +1,15 @@
+---
+- name: Install CRI-O, Kubelet, Kubeadm
+  hosts: all
+  become: true
+  roles:
+    - cri-o
+    - kubelet
+    - kubeadm
+
+- name: Install Kubect
+  hosts: masters
+  become: true
+  roles:
+    - kubectl
+
