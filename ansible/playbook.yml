@@ -1,15 +1,48 @@
 ---
-- name: Install CRI-O, Kubelet, Kubeadm
+- name: Prepare all nodes
+  hosts: all
+  become: true
+  roles:
+    - prepare
+
+- name: Install CRI-O
   hosts: all
   become: true
   roles:
     - cri-o
+
+- name: Install kubelet
+  hosts: all
+  become: true
+  roles:
     - kubelet
+
+- name: Install kubeadm
+  hosts: all
+  become: true
+  roles:
     - kubeadm
 
-- name: Install Kubect
+- name: Install kubectl
   hosts: masters
   become: true
   roles:
     - kubectl
 
+- name: Initialize Kubernetes master
+  hosts: masters[0]
+  become: true
+  roles:
+    - init_master
+
+- name: Install Calico network
+  hosts: masters[0]
+  become: true
+  roles:
+    - calico
+
+- name: Join worker nodes
+  hosts: workers
+  become: true
+  roles:
+    - join_nodes
