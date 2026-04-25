@@ -1,7 +1,7 @@
 ---
 # tasks file for calico
 
-- name: Check calico namespace:
+- name: Check calico namespace
   ansible.builtin.shell: kubectl get ns calico-system
   register: calico_ns
   environment:
@@ -10,14 +10,14 @@
 
 - name: Install Calico CRDs
   ansible.builtin.command: >
-    kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v{{ calico_version }}/manifests/operator-crds.yaml
+    kubectl apply --server-side=true -f https://raw.githubusercontent.com/projectcalico/calico/v{{ calico_version }}/manifests/operator-crds.yaml
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
   when: calico_ns.rc != 0
 
 - name: Install Tigera operator
   ansible.builtin.command: >
-    kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v{{ calico_version }}/manifests/tigera-operator.yaml
+    kubectl apply --server-side=true -f https://raw.githubusercontent.com/projectcalico/calico/v{{ calico_version }}/manifests/tigera-operator.yaml
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
   when: calico_ns.rc != 0
