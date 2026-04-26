@@ -24,7 +24,7 @@
     - br_netfilter
     - overlay
 
-- name: Persist kernel modules
+- name: Set kernel modules
   ansible.builtin.copy:
     dest: /etc/modules-load.d/k8s.conf
     content: |

@@ -13,7 +13,7 @@
   when: not kubelet_conf.stat.exists
 
 - name: Join Kubernetes cluster
-  ansible.builtin.command: "{{ join_cmd.stdout }}"
+  ansible.builtin.command: "{{ join_cmd.stdout }} --cri-socket=unix:///var/run/crio/crio.sock"
   register: join_result
   retries: 2
   delay: 10
