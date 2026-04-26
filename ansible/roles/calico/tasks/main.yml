@@ -8,7 +8,7 @@
     KUBECONFIG: /etc/kubernetes/admin.conf
   failed_when: no
 
-- name: Install Calico CRDs
+- name: Install Calico CRD
   ansible.builtin.command: >
     kubectl apply --server-side=true -f https://raw.githubusercontent.com/projectcalico/calico/v{{ calico_version }}/manifests/operator-crds.yaml
   environment:
@@ -22,14 +22,14 @@
     KUBECONFIG: /etc/kubernetes/admin.conf
   when: calico_ns.rc != 0
 
-- name: Download Calico custom resources
+- name: Download Calico resources
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/projectcalico/calico/v{{ calico_version }}/manifests/custom-resources.yaml
     dest: /tmp/calico-custom-resources.yaml
     mode: "0644"
   when: calico_ns.rc != 0
 
-- name: Apply Calico custom resources
+- name: Apply Calico resources
   ansible.builtin.command: >
     kubectl apply -f /tmp/calico-custom-resources.yaml
   environment:
