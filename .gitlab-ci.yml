@@ -30,7 +30,7 @@ stages:
     export DOCKER_TOKEN=$(curl -s -H "X-Vault-Token: $VAULT_TOKEN" "$VAULT_ADDR/v1/kv/data/dockerhub" | jq -r '.data.data.token')
     
     mkdir -p /kaniko/.docker images
-    echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"username\":\"$DOCKER_USER\",\"password\":\"$DOCKER_TOKEN\"}}}" > /kaniko/.docker/config.json
+    echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_TOKEN\"}}}" > /kaniko/.docker/config.json
 
 .push_script: &push_script
   - apk add --no-cache curl jq skopeo
@@ -138,7 +138,7 @@ build_job:
     *build_script
   script:
     - echo "=============== Build image ==============="
-    - /kaniko/executor --context "${CI_PROJECT_DIR}" --dockerfile "${CI_PROJECT_DIR}/Dockerfile" --no-push --tar-path=images/image.tar
+    - /kaniko/executor --context "${CI_PROJECT_DIR}" --dockerfile "${CI_PROJECT_DIR}/Dockerfile" --verbosity=debug --no-push --tar-path=images/image.tar
     - echo "=============== Build Done ==============="
   artifacts:
     when: on_success
