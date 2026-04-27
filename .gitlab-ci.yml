@@ -30,7 +30,8 @@ stages:
     export DOCKER_TOKEN=$(curl -s -H "X-Vault-Token: $VAULT_TOKEN" "$VAULT_ADDR/v1/kv/data/dockerhub" | jq -r '.data.data.token')
     
     mkdir -p /kaniko/.docker images
-    echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_TOKEN\"}}}" > /kaniko/.docker/config.json
+    AUTH_STRING=$(echo -n "$DOCKER_USER:$DOCKER_TOKEN" | base64)
+    echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$AUTH_STRING\"}}}" > /kaniko/.docker/config.json
 
 .push_script: &push_script
   - apk add --no-cache curl jq skopeo
