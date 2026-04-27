@@ -32,6 +32,7 @@ stages:
     mkdir -p /kaniko/.docker images
     AUTH_STRING=$(echo -n "$DOCKER_USER:$DOCKER_TOKEN" | base64)
     echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$AUTH_STRING\"}}}" > /kaniko/.docker/config.json
+    export DOCKER_CONFIG=/kaniko/.docker
 
 .push_script: &push_script
   - apk add --no-cache curl jq skopeo
