@@ -129,7 +129,7 @@ build_job:
     - docker
   <<: *rules_build
   image:
-    name: gcr.io/kaniko-project/executor:v1.22.0-debug
+    name: artemi00/kaniko_curl:1.0
     entrypoint: [""]
   id_tokens:
     VAULT_ID_TOKEN:
