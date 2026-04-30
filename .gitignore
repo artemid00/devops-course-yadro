@@ -2,3 +2,4 @@
 *.env
 ansible/venv
 __pycache__
+.vagrant/
