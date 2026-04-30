@@ -1,0 +1,43 @@
+---
+# tasks file for init_master
+
+- name: Check initialization
+  ansible.builtin.stat:
+    path: /etc/kubernetes/admin.conf
+  register: kubeadm_init
+
+- name: Init kubeadm
+  ansible.builtin.command: >
+    kubeadm init --apiserver-advertise-address={{ ansible_host }} --pod-network-cidr=192.168.0.0/16 --cri-socket=unix:///var/run/crio/crio.sock
+  when: not kubeadm_init.stat.exists
+
+- name: Create kube config dir
+  ansible.builtin.file:
+    path: /root/.kube
+    state: directory
+    mode: "0700"
+
+- name: Copy admin kubeconfig
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+    remote_src: yes
+    mode: "0600"
+
+- name: Check join command
+  ansible.builtin.stat:
+    path: /etc/kubernetes/join_command
+  register: join_file
+
+- name: Generate join command
+  ansible.builtin.command: >
+    kubeadm token create --print-join-command
+  register: join_command
+  when: not join_file.stat.exists
+
+- name: Store join command
+  ansible.builtin.copy:
+    dest: /etc/kubernetes/join_command
+    content: "{{ join_command.stdout }}"
+    mode: "0600"
+  when: not join_file.stat.exists
