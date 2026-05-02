@@ -140,7 +140,7 @@ build_job:
     *build_script
   script:
     - echo "=============== Build image ==============="
-    - /kaniko/executor --context "${CI_PROJECT_DIR}" --dockerfile "${CI_PROJECT_DIR}/Dockerfile" --verbosity=debug --no-push --tar-path=images/image.tar
+    - /kaniko/executor --context "${CI_PROJECT_DIR}" --dockerfile "${CI_PROJECT_DIR}/Dockerfile" --no-push --tar-path=images/image.tar
     - echo "=============== Build Done ==============="
   artifacts:
     when: on_success
