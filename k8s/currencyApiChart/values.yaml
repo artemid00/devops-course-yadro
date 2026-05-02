@@ -1,0 +1,31 @@
+name: currency-api
+
+replicaCount: 2
+
+image:
+  repository: artemi00/currency_api
+  tag: 13fab546a3cc09a7fb101e45cee46787ad21941b
+
+containerPort: 8000
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+probes:
+  path: /info
+
+service:
+  type: ClusterIP
+
+ingress:
+  host: currency.xata436.ru
+  hostPath: /
+  pathType: Prefix
+  tls:
+    isEnabled: true
+    secretName: currency-api-tls

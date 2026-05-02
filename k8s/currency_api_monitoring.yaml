@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: currency-api-metrics
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: currency-api
+  endpoints:
+    - path: /metrics
+      port: http
+      interval: 15s
