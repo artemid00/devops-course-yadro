@@ -9,11 +9,13 @@ spec:
   selector:
     matchLabels:
       app: {{ .Values.name }}
+
   template:
     metadata:
       labels:
         app: {{ .Values.name }}
     spec:
+      
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -23,11 +25,13 @@ spec:
                   matchLabels:
                     app: {{ .Values.name }}
                 topologyKey: kubernetes.io/hostname
+
       containers:
         - name: {{ .Values.name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
             - containerPort: {{ .Values.containerPort }}
+
           resources:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}
@@ -35,6 +39,7 @@ spec:
             limits:
               cpu: {{ .Values.resources.limits.cpu }}
               memory: {{ .Values.resources.limits.memory }}
+
           readinessProbe:
             httpGet:
               path: {{ .Values.probes.path }}
@@ -44,6 +49,7 @@ spec:
             timeoutSeconds: 2
             failureThreshold: 3
             successThreshold: 1
+
           livenessProbe:
             httpGet:
               path: {{ .Values.probes.path }}
