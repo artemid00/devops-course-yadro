@@ -10,3 +10,7 @@
 
 .git
 reports/
+k8s/
+ci/
+ansible/
+*.sh
