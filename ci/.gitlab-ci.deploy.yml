@@ -34,15 +34,15 @@ deploy_job:
 
 smoke_test:
   stage: smoke
-  image: curlimages/curl:8.5.0
   tags:
     - "${ENVIRONMENT}_shell"
-  script:
+  before_script:
     - |
       if [ "$ENVIRONMENT" = "production" ]; then
         HOST="https://currency.xata436.ru/info"
       else
         HOST="https://dev.xata436.ru/info"
       fi
-      sleep 15
-      curl -f -v "$HOST" || exit 1
+  script:
+    - sleep 15
+    - curl -f -v "$HOST" || exit 1
