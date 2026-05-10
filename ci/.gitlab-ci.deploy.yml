@@ -10,7 +10,9 @@ variables:
 
 deploy_job:
   stage: deploy
-  image: alpine/git:2.43.0
+  image:
+    name: alpine/git:2.43.0
+    entrypoint: [""]
   tags:
     - docker
   before_script:
