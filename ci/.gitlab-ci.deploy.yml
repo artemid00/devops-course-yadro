@@ -10,27 +10,21 @@ variables:
 
 deploy_job:
   stage: deploy
-  image: alpine/git:latest
-  tags:
-    - docker 
-  script:
-    - echo "========= Deploy to ${ENVIRONMENT} ========="
-
+  image: alpine/git:2.43.0
+  before_script:
     - |
+      git config --global user.email "ci@mail.com"
+      git config --global user.name "GitLab CI"
       if [ "$ENVIRONMENT" = "production" ]; then
-        VALUES_FILE="environments/prod-values.yaml"
+        export VALUES_FILE="environments/prod-values.yaml"
       else
-        VALUES_FILE="environments/staging-values.yaml"
+        export VALUES_FILE="environments/staging-values.yaml"
       fi
-    - git clone "$DEPLOY_REPO" deploy-repo
+  script:
+    - git clone "$DEPLOY_REPO_URL" deploy-repo
+    - sed -i "s/^  tag:.*/  tag: ${IMAGE_TAG}/" "deploy-repo/$VALUES_FILE"
+    - grep "tag:" "deploy-repo/$VALUES_FILE"
     - cd deploy-repo
-
-    - |
-      sed -i "s/^  tag:.*/  tag: ${IMAGE_TAG}/" "$VALUES_FILE"
-    - grep "tag:" "$VALUES_FILE"
-
-    - git config user.email "ci@mail.com"
-    - git config user.name "GitLab CI"
     - git add "$VALUES_FILE"
     - git commit -m "ci: deploy ${APP_NAME}:${IMAGE_TAG} to ${ENVIRONMENT} [skip ci]"
     - git push origin main
