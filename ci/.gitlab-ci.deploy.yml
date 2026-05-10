@@ -24,12 +24,11 @@ deploy_job:
       fi
   script:
     - git clone "$DEPLOY_REPO_URL" deploy-repo
-    - sed -i "s/^  tag:.*/  tag: ${IMAGE_TAG}/" "deploy-repo/$VALUES_FILE"
+    - 'sed -i "s/^  tag:.*/  tag: ${IMAGE_TAG}/" "deploy-repo/$VALUES_FILE"'
     - grep "tag:" "deploy-repo/$VALUES_FILE"
     - cd deploy-repo
     - git add "$VALUES_FILE"
-    - git diff --staged --quiet && echo "No changes" && exit 0
-    - git commit -m "ci: deploy ${APP_NAME}:${IMAGE_TAG} to ${ENVIRONMENT} [skip ci]"
+    - 'git commit -m "ci: deploy ${APP_NAME}:${IMAGE_TAG} to ${ENVIRONMENT} [skip ci]"'
     - git push origin main
 
 smoke_test:
