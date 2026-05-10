@@ -6,16 +6,34 @@ variables:
   APP_NAME: "${APP_NAME}"
   IMAGE_TAG: "${IMAGE_TAG}"
   ENVIRONMENT: "${ENVIRONMENT}"
+  DEPLOY_REPO: "https://ci-bot:${DEPLOY_REPO_TOKEN}@education-git.yadro.com/education/devops/2026/app-deployment.git"
 
 deploy_job:
   stage: deploy
+  image: alpine/git:latest
   tags:
-    - "${ENVIRONMENT}_shell"
+    - docker 
   script:
     - echo "========= Deploy to ${ENVIRONMENT} ========="
-    - docker pull ${DOCKER_HUB_USER}/${APP_NAME}:${IMAGE_TAG}
-    - docker compose -f docker-compose.yml down
-    - docker compose -f docker-compose.yml up -d
+
+    - |
+      if [ "$ENVIRONMENT" = "production" ]; then
+        VALUES_FILE="environments/prod-values.yaml"
+      else
+        VALUES_FILE="environments/staging-values.yaml"
+      fi
+    - git clone "$DEPLOY_REPO" deploy-repo
+    - cd deploy-repo
+
+    - |
+      sed -i "s/^  tag:.*/  tag: ${IMAGE_TAG}/" "$VALUES_FILE"
+    - grep "tag:" "$VALUES_FILE"
+
+    - git config user.email "ci@mail.com"
+    - git config user.name "GitLab CI"
+    - git add "$VALUES_FILE"
+    - git commit -m "ci: deploy ${APP_NAME}:${IMAGE_TAG} to ${ENVIRONMENT} [skip ci]"
+    - git push origin main
 
 smoke_test:
   stage: smoke
@@ -23,4 +41,11 @@ smoke_test:
     - "${ENVIRONMENT}_shell"
   script:
     - echo "======== Smoke test ========"
-    - curl -v "http://localhost:${PORT:-8000}/info" || exit 1
+    - |
+      if [ "$ENVIRONMENT" = "production" ]; then
+        HOST="https://currency.xata436.ru/info"
+      else
+        HOST="https://dev.xata436.ru/info"
+      fi
+    - sleep 15
+    - curl -v "${HOST}" || exit 1
