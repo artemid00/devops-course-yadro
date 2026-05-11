@@ -19,9 +19,9 @@ variables:
     git config --global user.name "GitLab CI"
 
     if [ "$ENVIRONMENT" = "production" ]; then
-      VALUES_FILE="environments/prod-values.yaml"
+      VALUES_FILE="currencyApiChart/environments/prod-values.yaml"
     else
-      VALUES_FILE="environments/staging-values.yaml"
+      VALUES_FILE="currencyApiChart/environments/staging-values.yaml"
     fi
 # =========================
 
