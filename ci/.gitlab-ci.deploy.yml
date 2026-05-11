@@ -12,7 +12,7 @@ variables:
   - apk add --no-cache curl jq
   - |
     export VAULT_TOKEN=$(curl -s -X POST "$VAULT_ADDR/v1/auth/jwt/login" -d "{\"role\":\"gitlab-dockerhub-role\",\"jwt\":\"$VAULT_ID_TOKEN\"}" | jq -r '.auth.client_token')
-    export DEPLOY_REPO_TOKEN=$(curl -s -H "X-Vault-Token: $VAULT_TOKEN" "$VAULT_ADDR/v1/kv/data/gitlab" | jq -r '.data.data.deploy-token')
+    export DEPLOY_REPO_TOKEN=$(curl -s -H "X-Vault-Token: $VAULT_TOKEN" "$VAULT_ADDR/v1/kv/data/gitlab" | jq -r '.data.data.deploy_token')
     export DEPLOY_REPO_URL="https://argo-cd:${DEPLOY_REPO_TOKEN}@education-git.yadro.com/education/devops/2026/a.bezpyatko/app-deployment.git"
 
     git config --global user.email "ci@mail.com"
