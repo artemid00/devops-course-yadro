@@ -43,7 +43,7 @@ deploy_job:
     - grep "tag:" "deploy-repo/$VALUES_FILE"
     - cd deploy-repo
     - git add "$VALUES_FILE"
-    - 'git commit -m "ci: deploy ${APP_NAME}:${IMAGE_TAG} to ${ENVIRONMENT} [skip ci]"'
+    - 'git commit -m "ci: deploy ${APP_NAME}:${IMAGE_TAG} to ${ENVIRONMENT}"'
     - git push origin main
 
 smoke_test:
