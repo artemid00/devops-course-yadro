@@ -6,24 +6,37 @@ variables:
   APP_NAME: "${APP_NAME}"
   IMAGE_TAG: "${IMAGE_TAG}"
   ENVIRONMENT: "${ENVIRONMENT}"
-  DEPLOY_REPO_URL: "https://ci-bot:${DEPLOY_REPO_TOKEN}@education-git.yadro.com/education/devops/2026/a.bezpyatko/app-deployment.git"
+
+# =========================
+.vault_deploy_auth: &vault_deploy_auth
+  - apk add --no-cache curl jq
+  - |
+    export VAULT_TOKEN=$(curl -s -X POST "$VAULT_ADDR/v1/auth/jwt/login" -d "{\"role\":\"gitlab-dockerhub-role\",\"jwt\":\"$VAULT_ID_TOKEN\"}" | jq -r '.auth.client_token')
+    export DEPLOY_REPO_TOKEN=$(curl -s -H "X-Vault-Token: $VAULT_TOKEN" "$VAULT_ADDR/v1/kv/data/gitlab" | jq -r '.data.data.deploy-token')
+    export DEPLOY_REPO_URL="https://argo-cd:${DEPLOY_REPO_TOKEN}@education-git.yadro.com/education/devops/2026/a.bezpyatko/app-deployment.git"
+
+    git config --global user.email "ci@mail.com"
+    git config --global user.name "GitLab CI"
+
+    if [ "$ENVIRONMENT" = "production" ]; then
+      VALUES_FILE="environments/prod-values.yaml"
+    else
+      VALUES_FILE="environments/staging-values.yaml"
+    fi
+# =========================
 
 deploy_job:
   stage: deploy
   image:
-    name: alpine/git:2.43.0
+    name: alpine/git@sha256:d453f54c83320412aa89c391b076930bd8569bc1012285e8c68ce2d4435826a3
     entrypoint: [""]
   tags:
     - docker
+  id_tokens:
+    VAULT_ID_TOKEN:
+      aud: http://10.184.0.26:8200
   before_script:
-    - |
-      git config --global user.email "ci@mail.com"
-      git config --global user.name "GitLab CI"
-      if [ "$ENVIRONMENT" = "production" ]; then
-        VALUES_FILE="environments/prod-values.yaml"
-      else
-        VALUES_FILE="environments/staging-values.yaml"
-      fi
+    *vault_deploy_auth
   script:
     - git clone "$DEPLOY_REPO_URL" deploy-repo
     - 'sed -i "s/^  tag:.*/  tag: ${IMAGE_TAG}/" "deploy-repo/$VALUES_FILE"'
