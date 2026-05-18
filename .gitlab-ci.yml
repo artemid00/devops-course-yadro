@@ -232,7 +232,7 @@ dast_job:
     name: ghcr.io/zaproxy/zaproxy:20260304-stable@sha256:47b883dca0d77aeef1dbb9b8ce1f4baddde348ad5852666e553456a9ad936111
     entrypoint: [""]
   variables:
-    TARGET_URL: "http://10.184.0.155:8000/info"
+    TARGET_URL: "https://dev.xata436.ru/info"
   before_script:
     - mkdir -p /zap/wrk
     - cd /zap/wrk
