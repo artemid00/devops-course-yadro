@@ -7,20 +7,56 @@ variables:
   IMAGE_TAG: "${IMAGE_TAG}"
   ENVIRONMENT: "${ENVIRONMENT}"
 
+# =========================
+.vault_deploy_auth: &vault_deploy_auth
+  - apk add --no-cache curl jq
+  - |
+    export VAULT_TOKEN=$(curl -s -X POST "$VAULT_ADDR/v1/auth/jwt/login" -d "{\"role\":\"gitlab-dockerhub-role\",\"jwt\":\"$VAULT_ID_TOKEN\"}" | jq -r '.auth.client_token')
+    export DEPLOY_REPO_TOKEN=$(curl -s -H "X-Vault-Token: $VAULT_TOKEN" "$VAULT_ADDR/v1/kv/data/gitlab" | jq -r '.data.data.deploy_token')
+    export DEPLOY_REPO_URL="https://argo-cd:${DEPLOY_REPO_TOKEN}@education-git.yadro.com/education/devops/2026/a.bezpyatko/app-deployment.git"
+
+    git config --global user.email "ci@mail.com"
+    git config --global user.name "GitLab CI"
+
+    if [ "$ENVIRONMENT" = "production" ]; then
+      VALUES_FILE="currencyApiChart/environments/prod-values.yaml"
+    else
+      VALUES_FILE="currencyApiChart/environments/staging-values.yaml"
+    fi
+# =========================
+
 deploy_job:
   stage: deploy
+  image:
+    name: alpine/git@sha256:d453f54c83320412aa89c391b076930bd8569bc1012285e8c68ce2d4435826a3
+    entrypoint: [""]
   tags:
-    - "${ENVIRONMENT}_shell"
+    - docker
+  id_tokens:
+    VAULT_ID_TOKEN:
+      aud: http://10.184.0.26:8200
+  before_script:
+    *vault_deploy_auth
   script:
-    - echo "========= Deploy to ${ENVIRONMENT} ========="
-    - docker pull ${DOCKER_HUB_USER}/${APP_NAME}:${IMAGE_TAG}
-    - docker compose -f docker-compose.yml down
-    - docker compose -f docker-compose.yml up -d
+    - git clone "$DEPLOY_REPO_URL" deploy-repo
+    - 'sed -i "s/^  tag:.*/  tag: ${IMAGE_TAG}/" "deploy-repo/$VALUES_FILE"'
+    - grep "tag:" "deploy-repo/$VALUES_FILE"
+    - cd deploy-repo
+    - git add "$VALUES_FILE"
+    - 'git commit -m "ci: deploy ${APP_NAME}:${IMAGE_TAG} to ${ENVIRONMENT}"'
+    - git push origin main
 
 smoke_test:
   stage: smoke
   tags:
     - "${ENVIRONMENT}_shell"
+  before_script:
+    - |
+      if [ "$ENVIRONMENT" = "production" ]; then
+        HOST="https://currency.xata436.ru/info"
+      else
+        HOST="https://dev.xata436.ru/info"
+      fi
   script:
-    - echo "======== Smoke test ========"
-    - curl -v "http://localhost:${PORT:-8000}/info" || exit 1
+    - sleep 20
+    - curl -f -v "$HOST" || exit 1
